@@ -3,7 +3,10 @@ import { router } from '@inertiajs/react';
 
 export default function Index({ tasks }) {
     const [title, setTitle] = useState('');
+    const [editingTaskId, setEditingTaskId] = useState(null);
+    const [editingTitle, setEditingTitle] = useState('');
 
+    // Add Task
     const addTask = (e) => {
         e.preventDefault();
 
@@ -12,18 +15,46 @@ export default function Index({ tasks }) {
         }
 
         router.post('/tasks', {
-            title: title,
+            title: title.trim(),
         });
 
         setTitle('');
     };
 
+    // Complete / Undo Task
     const toggleTask = (taskId) => {
         router.put(`/tasks/${taskId}`);
     };
 
+    // Delete Task
     const deleteTask = (taskId) => {
         router.delete(`/tasks/${taskId}`);
+    };
+
+    // Start Editing
+    const startEditing = (task) => {
+        setEditingTaskId(task.id);
+        setEditingTitle(task.title);
+    };
+
+    // Cancel Editing
+    const cancelEditing = () => {
+        setEditingTaskId(null);
+        setEditingTitle('');
+    };
+
+    // Save Edited Task
+    const saveTask = (taskId) => {
+        if (!editingTitle.trim()) {
+            return;
+        }
+
+        router.put(`/tasks/${taskId}`, {
+            title: editingTitle.trim(),
+        });
+
+        setEditingTaskId(null);
+        setEditingTitle('');
     };
 
     return (
@@ -71,6 +102,7 @@ export default function Index({ tasks }) {
                 {/* Tasks Section */}
                 <div className="rounded-xl bg-white p-6 shadow">
 
+                    {/* Tasks Header */}
                     <div className="mb-5 flex items-center justify-between">
                         <h2 className="text-xl font-semibold text-gray-700">
                             Tasks
@@ -97,60 +129,126 @@ export default function Index({ tasks }) {
 
                         /* Task List */
                         <div className="space-y-3">
+
                             {tasks.map((task) => (
                                 <div
                                     key={task.id}
                                     className="flex items-center justify-between rounded-lg border border-gray-200 p-4"
                                 >
 
-                                    {/* Task Name */}
-                                    <div className="flex items-center gap-3">
+                                    {/* Task Details */}
+                                    <div className="flex flex-1 items-center gap-3">
 
+                                        {/* Status Icon */}
                                         <span className="text-xl">
-                                            {task.completed
-                                                ? '✅'
-                                                : '☐'}
+                                            {task.completed ? '✅' : '☐'}
                                         </span>
 
-                                        <span
-                                            className={
-                                                task.completed
-                                                    ? 'text-gray-400 line-through'
-                                                    : 'text-gray-700'
-                                            }
-                                        >
-                                            {task.title}
-                                        </span>
+                                        {/* Edit Input OR Task Title */}
+                                        {editingTaskId === task.id ? (
+                                            <input
+                                                type="text"
+                                                value={editingTitle}
+                                                onChange={(e) =>
+                                                    setEditingTitle(
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        saveTask(task.id);
+                                                    }
+
+                                                    if (e.key === 'Escape') {
+                                                        cancelEditing();
+                                                    }
+                                                }}
+                                                autoFocus
+                                                className="flex-1 rounded-lg border border-blue-400 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
+                                            />
+                                        ) : (
+                                            <span
+                                                className={
+                                                    task.completed
+                                                        ? 'text-gray-400 line-through'
+                                                        : 'text-gray-700'
+                                                }
+                                            >
+                                                {task.title}
+                                            </span>
+                                        )}
 
                                     </div>
 
                                     {/* Buttons */}
-                                    <div className="flex gap-2">
+                                    <div className="ml-4 flex gap-2">
 
-                                        <button
-                                            onClick={() =>
-                                                toggleTask(task.id)
-                                            }
-                                            className="rounded-lg bg-green-100 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-200"
-                                        >
-                                            {task.completed
-                                                ? 'Undo'
-                                                : 'Complete'}
-                                        </button>
+                                        {editingTaskId === task.id ? (
+                                            <>
+                                                {/* Save Button */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        saveTask(task.id)
+                                                    }
+                                                    className="rounded-lg bg-blue-100 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-200"
+                                                >
+                                                    Save
+                                                </button>
 
-                                        <button
-                                            onClick={() =>
-                                                deleteTask(task.id)
-                                            }
-                                            className="rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-200"
-                                        >
-                                            Delete
-                                        </button>
+                                                {/* Cancel Button */}
+                                                <button
+                                                    type="button"
+                                                    onClick={cancelEditing}
+                                                    className="rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {/* Edit Button */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        startEditing(task)
+                                                    }
+                                                    className="rounded-lg bg-yellow-100 px-3 py-2 text-sm font-medium text-yellow-700 hover:bg-yellow-200"
+                                                >
+                                                    Edit
+                                                </button>
+
+                                                {/* Complete / Undo Button */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        toggleTask(task.id)
+                                                    }
+                                                    className="rounded-lg bg-green-100 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-200"
+                                                >
+                                                    {task.completed
+                                                        ? 'Undo'
+                                                        : 'Complete'}
+                                                </button>
+
+                                                {/* Delete Button */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        deleteTask(task.id)
+                                                    }
+                                                    className="rounded-lg bg-red-100 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-200"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </>
+                                        )}
 
                                     </div>
 
                                 </div>
                             ))}
+
                         </div>
                     )}
 

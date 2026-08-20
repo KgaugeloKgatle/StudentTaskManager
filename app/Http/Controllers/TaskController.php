@@ -30,11 +30,21 @@ class TaskController extends Controller
         return redirect()->back();
     }
 
-    public function update(Task $task)
+    public function update(Request $request, Task $task)
     {
-        $task->update([
-            'completed' => !$task->completed,
-        ]);
+        if ($request->has('title')) {
+            $request->validate([
+                'title' => 'required|string|max:255',
+            ]);
+
+            $task->update([
+                'title' => $request->title,
+            ]);
+        } else {
+            $task->update([
+                'completed' => !$task->completed,
+            ]);
+        }
 
         return redirect()->back();
     }

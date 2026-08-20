@@ -10,4 +10,6 @@ Route::get('/', function () {
 Route::get('/tasks', [TaskController::class, 'index']);
 Route::post('/tasks', [TaskController::class, 'store']);
 Route::put('/tasks/{task}',[TaskController::class, 'update']);
+Route::put('/tasks/{task}/toggle', [TaskController::class, 'toggle']);
 Route::delete('/tasks/{task}', [TaskController::class,'destroy']);
+

@@ -32,19 +32,22 @@ class TaskController extends Controller
 
     public function update(Request $request, Task $task)
     {
-        if ($request->has('title')) {
-            $request->validate([
-                'title' => 'required|string|max:255',
-            ]);
+        $request->validate([
+            'title' => 'required|string|max:255',
+        ]);
 
-            $task->update([
-                'title' => $request->title,
-            ]);
-        } else {
-            $task->update([
-                'completed' => !$task->completed,
-            ]);
-        }
+        $task->update([
+            'title' => $request->title,
+        ]);
+
+        return redirect()->back();
+    }
+
+    public function toggle(Task $task)
+    {
+        $task->update([
+            'completed' => !$task->completed,
+        ]);
 
         return redirect()->back();
     }

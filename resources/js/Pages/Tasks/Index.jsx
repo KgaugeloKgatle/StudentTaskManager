@@ -6,7 +6,7 @@ export default function Index({ tasks }) {
     const [editingTaskId, setEditingTaskId] = useState(null);
     const [editingTitle, setEditingTitle] = useState('');
 
-    // Add Task
+    // ADD TASK
     const addTask = (e) => {
         e.preventDefault();
 
@@ -21,29 +21,31 @@ export default function Index({ tasks }) {
         setTitle('');
     };
 
-    // Complete / Undo Task
+    // COMPLETE / UNDO TASK
     const toggleTask = (taskId) => {
-        router.put(`/tasks/${taskId}`);
+        router.put(`/tasks/${taskId}/toggle`);
     };
 
-    // Delete Task
+    // DELETE TASK
     const deleteTask = (taskId) => {
-        router.delete(`/tasks/${taskId}`);
+        if (confirm('Are you sure you want to delete this task?')) {
+            router.delete(`/tasks/${taskId}`);
+        }
     };
 
-    // Start Editing
+    // START EDITING
     const startEditing = (task) => {
         setEditingTaskId(task.id);
         setEditingTitle(task.title);
     };
 
-    // Cancel Editing
+    // CANCEL EDITING
     const cancelEditing = () => {
         setEditingTaskId(null);
         setEditingTitle('');
     };
 
-    // Save Edited Task
+    // SAVE EDITED TASK
     const saveTask = (taskId) => {
         if (!editingTitle.trim()) {
             return;
@@ -61,7 +63,7 @@ export default function Index({ tasks }) {
         <div className="min-h-screen bg-gray-100 py-10">
             <div className="mx-auto max-w-3xl px-6">
 
-                {/* Header */}
+                {/* HEADER */}
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold text-gray-800">
                         Student Task Manager
@@ -72,7 +74,7 @@ export default function Index({ tasks }) {
                     </p>
                 </div>
 
-                {/* Add Task Section */}
+                {/* ADD TASK */}
                 <div className="mb-8 rounded-xl bg-white p-6 shadow">
                     <h2 className="mb-4 text-xl font-semibold text-gray-700">
                         Add Task
@@ -99,10 +101,10 @@ export default function Index({ tasks }) {
                     </form>
                 </div>
 
-                {/* Tasks Section */}
+                {/* TASKS */}
                 <div className="rounded-xl bg-white p-6 shadow">
 
-                    {/* Tasks Header */}
+                    {/* TASK HEADER */}
                     <div className="mb-5 flex items-center justify-between">
                         <h2 className="text-xl font-semibold text-gray-700">
                             Tasks
@@ -114,7 +116,7 @@ export default function Index({ tasks }) {
                         </span>
                     </div>
 
-                    {/* No Tasks */}
+                    {/* NO TASKS */}
                     {tasks.length === 0 ? (
                         <div className="py-10 text-center text-gray-500">
                             <p className="text-lg">
@@ -127,7 +129,7 @@ export default function Index({ tasks }) {
                         </div>
                     ) : (
 
-                        /* Task List */
+                        /* TASK LIST */
                         <div className="space-y-3">
 
                             {tasks.map((task) => (
@@ -136,15 +138,17 @@ export default function Index({ tasks }) {
                                     className="flex items-center justify-between rounded-lg border border-gray-200 p-4"
                                 >
 
-                                    {/* Task Details */}
+                                    {/* TASK NAME */}
                                     <div className="flex flex-1 items-center gap-3">
 
-                                        {/* Status Icon */}
+                                        {/* STATUS */}
                                         <span className="text-xl">
-                                            {task.completed ? '✅' : '☐'}
+                                            {task.completed
+                                                ? '✅'
+                                                : '☐'}
                                         </span>
 
-                                        {/* Edit Input OR Task Title */}
+                                        {/* EDIT MODE */}
                                         {editingTaskId === task.id ? (
                                             <input
                                                 type="text"
@@ -167,6 +171,8 @@ export default function Index({ tasks }) {
                                                 className="flex-1 rounded-lg border border-blue-400 px-3 py-2 outline-none focus:ring-2 focus:ring-blue-200"
                                             />
                                         ) : (
+
+                                            /* NORMAL MODE */
                                             <span
                                                 className={
                                                     task.completed
@@ -180,12 +186,12 @@ export default function Index({ tasks }) {
 
                                     </div>
 
-                                    {/* Buttons */}
+                                    {/* BUTTONS */}
                                     <div className="ml-4 flex gap-2">
 
                                         {editingTaskId === task.id ? (
                                             <>
-                                                {/* Save Button */}
+                                                {/* SAVE */}
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -196,7 +202,7 @@ export default function Index({ tasks }) {
                                                     Save
                                                 </button>
 
-                                                {/* Cancel Button */}
+                                                {/* CANCEL */}
                                                 <button
                                                     type="button"
                                                     onClick={cancelEditing}
@@ -207,7 +213,7 @@ export default function Index({ tasks }) {
                                             </>
                                         ) : (
                                             <>
-                                                {/* Edit Button */}
+                                                {/* EDIT */}
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -218,7 +224,7 @@ export default function Index({ tasks }) {
                                                     Edit
                                                 </button>
 
-                                                {/* Complete / Undo Button */}
+                                                {/* COMPLETE / UNDO */}
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -231,7 +237,7 @@ export default function Index({ tasks }) {
                                                         : 'Complete'}
                                                 </button>
 
-                                                {/* Delete Button */}
+                                                {/* DELETE */}
                                                 <button
                                                     type="button"
                                                     onClick={() =>
